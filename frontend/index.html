@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RecruitFlow AI — Multi-Agent HR Resume Ranker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <span class="logo-text">RecruitFlow</span>
+    <span class="logo-badge">Multi-Agent</span>
+  </div>
+  <nav class="nav">
+    <button class="nav-pill active" data-tab="rank">Rank</button>
+    <button class="nav-pill" data-tab="history">History</button>
+    <button class="nav-pill" data-tab="analytics">Analytics</button>
+  </nav>
+</header>
+
+<main class="main">
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- TAB 1: RANK                            -->
+  <!-- ═══════════════════════════════════════ -->
+  <section id="tab-rank" class="tab-content active">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-label">Powered by ChatGPT GPT-4o · 6 Agents</div>
+      <h1>Find the perfect hire, automatically.</h1>
+      <p>Upload resumes and a job description. 6 AI agents powered by GPT-4o analyze, score, and rank every candidate in seconds.</p>
+    </div>
+
+    <!-- AGENT PIPELINE VISUALIZER -->
+    <div class="pipeline">
+      <div class="pipeline-node" id="agent-orchestrator">
+        <div class="pipeline-node-dot">🎯</div>
+        <div class="pipeline-node-label">Orchestrator</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-node" id="agent-parser">
+        <div class="pipeline-node-dot">📄</div>
+        <div class="pipeline-node-label">Parser</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-node" id="agent-analyzer">
+        <div class="pipeline-node-dot">🔍</div>
+        <div class="pipeline-node-label">Analyzer</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-node" id="agent-scorer">
+        <div class="pipeline-node-dot">⭐</div>
+        <div class="pipeline-node-label">Scorer</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-node" id="agent-ranker">
+        <div class="pipeline-node-dot">🏆</div>
+        <div class="pipeline-node-label">Ranker</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-node" id="agent-db">
+        <div class="pipeline-node-dot">💾</div>
+        <div class="pipeline-node-label">Database</div>
+      </div>
+    </div>
+
+    <!-- TWO-COLUMN INPUT -->
+    <div class="form-grid">
+
+      <!-- LEFT: JOB DESCRIPTION -->
+      <div class="panel">
+        <div class="panel-title"><span class="panel-title-icon">💼</span> Job Description</div>
+        <div class="form-group">
+          <label class="form-label" for="job-title">Job Title</label>
+          <input class="form-input" id="job-title" type="text" placeholder="e.g. Senior Full Stack Developer" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="job-description">Job Description</label>
+          <textarea class="form-textarea" id="job-description" placeholder="Paste the full job description here — responsibilities, required skills, experience, education requirements..."></textarea>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="example-job-btn">Load Example Job</button>
+      </div>
+
+      <!-- RIGHT: CANDIDATE RESUMES -->
+      <div class="panel">
+        <div class="panel-title"><span class="panel-title-icon">👥</span> Candidate Resumes</div>
+
+        <!-- Upload zone -->
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-icon">📁</div>
+          <div class="upload-text">Drop files here or <strong>Browse Files</strong></div>
+          <div class="upload-hint">TXT, PDF, DOC, DOCX · Max 20 files · 10MB each</div>
+        </div>
+        <input type="file" id="file-input" accept=".txt,.pdf,.doc,.docx" multiple style="display:none" />
+        <div id="file-list" class="file-list"></div>
+
+        <!-- OR divider -->
+        <div class="or-divider">OR</div>
+
+        <!-- Paste areas -->
+        <div id="paste-areas">
+          <div class="paste-area-wrap" id="wrap-paste-1">
+            <textarea class="paste-textarea" id="paste-1" placeholder="Paste resume text here..." rows="4"></textarea>
+          </div>
+        </div>
+        <button class="btn btn-add btn-sm mt-1 w-full" id="add-paste-btn">+ Add Another Resume</button>
+
+        <div class="mt-2">
+          <button class="btn btn-ghost btn-sm" id="example-resumes-btn">Load Example Resumes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RANK BUTTON -->
+    <div class="rank-btn-wrap">
+      <button class="btn btn-primary" id="rank-btn">Rank All Candidates</button>
+      <div class="rank-status" id="rank-status"></div>
+    </div>
+
+    <!-- RESULTS SECTION (hidden until first rank) -->
+    <div id="results-section" class="results-section hidden">
+
+      <!-- Summary cards -->
+      <div class="summary-cards">
+        <div class="summary-card">
+          <div class="summary-card-label">Total Candidates</div>
+          <div class="summary-card-value" id="card-total">0</div>
+          <div class="summary-card-sub">Analyzed</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-label">Top Score</div>
+          <div class="summary-card-value" id="card-top">0</div>
+          <div class="summary-card-sub">Out of 100</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-label">Avg Score</div>
+          <div class="summary-card-value" id="card-avg">0</div>
+          <div class="summary-card-sub">Across all</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-label">Recommended</div>
+          <div class="summary-card-value" id="card-rec">0</div>
+          <div class="summary-card-sub">Candidates</div>
+        </div>
+      </div>
+
+      <!-- Job requirements panel -->
+      <div class="requirements-panel">
+        <div class="requirements-title" id="req-title">Job Requirements</div>
+        <div class="requirements-row">
+          <span class="requirements-label">Required</span>
+          <div class="chips" id="req-required"></div>
+        </div>
+        <div class="requirements-row">
+          <span class="requirements-label">Preferred</span>
+          <div class="chips" id="req-preferred"></div>
+        </div>
+        <div class="requirements-meta" id="req-meta"></div>
+      </div>
+
+      <!-- Candidates list -->
+      <div class="candidates-title">Ranked Candidates</div>
+      <div id="candidates-list"></div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- TAB 2: HISTORY                         -->
+  <!-- ═══════════════════════════════════════ -->
+  <section id="tab-history" class="tab-content">
+    <div class="section-title">Ranking History</div>
+    <div class="section-subtitle">Past ranking sessions and their results.</div>
+    <div id="history-list"></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- TAB 3: ANALYTICS                       -->
+  <!-- ═══════════════════════════════════════ -->
+  <section id="tab-analytics" class="tab-content">
+    <div class="section-title">Analytics</div>
+    <div class="section-subtitle">Aggregate statistics across all ranking sessions.</div>
+    <div id="analytics-container"></div>
+  </section>
+
+</main>
+
+<!-- CANDIDATE DETAIL MODAL -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-rank-rec">
+          <span class="modal-rank" id="modal-rank">Rank #1</span>
+          <span class="rec-badge rec-strong" id="modal-rec">Strongly Recommended</span>
+        </div>
+        <div class="modal-name" id="modal-name">Candidate Name</div>
+      </div>
+      <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+    </div>
+
+    <div class="score-grid">
+      <div class="score-card">
+        <div class="score-card-label">Total</div>
+        <div class="score-card-value score-green" id="modal-total">0</div>
+      </div>
+      <div class="score-card">
+        <div class="score-card-label">Skills</div>
+        <div class="score-card-value" id="modal-skills">0</div>
+      </div>
+      <div class="score-card">
+        <div class="score-card-label">Experience</div>
+        <div class="score-card-value" id="modal-exp">0</div>
+      </div>
+      <div class="score-card">
+        <div class="score-card-label">Education</div>
+        <div class="score-card-value" id="modal-edu">0</div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Matched Skills</div>
+      <div class="chips" id="modal-matched"></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Missing Skills</div>
+      <div class="chips" id="modal-missing"></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">GPT-4o Assessment</div>
+      <div class="ai-summary-box" id="modal-summary"></div>
+    </div>
+    <div>
+      <span class="rec-badge" id="modal-bottom-rec"></span>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"F:/R&D/HR Resume\" 2>/dev/null || echo \"Empty directory\")",
+      "Bash(ls \"F:/R&D/HR Resume/backend/src/\")",
+      "Bash(echo \"=== Services ===\" && ls -la \"F:/R&D/HR Resume/backend/src/services/\" && echo \"=== Agents ===\" && ls -la \"F:/R&D/HR Resume/backend/src/agents/\" && echo \"=== Utils ===\" && ls -la \"F:/R&D/HR Resume/backend/src/utils/\" && echo \"=== Middleware ===\" && ls -la \"F:/R&D/HR Resume/backend/src/middleware/\" && echo \"=== Controllers ===\" && ls -la \"F:/R&D/HR Resume/backend/src/controllers/\" && echo \"=== Routes ===\" && ls -la \"F:/R&D/HR Resume/backend/src/routes/\" && echo \"=== Backend Root ===\" && ls -la \"F:/R&D/HR Resume/backend/\" | grep server.js)",
+      "Bash(find \"F:/R&D/HR Resume\" -type f | sort | grep -v node_modules)"
+    ]
+  }
+}
